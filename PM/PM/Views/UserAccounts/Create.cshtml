@@ -1,0 +1,146 @@
+﻿@model PM.Models.UserAccount
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<hr />
+<div class="flex-container" style="display: flex;">
+<div class="flex-child" style="flex: 1; border: 2px;">
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="AccountName" class="control-label"></label>
+                <input asp-for="AccountName" class="form-control"/>
+                <span asp-validation-for="AccountName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserName" class="control-label"></label>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="URL" class="control-label"></label>
+                <input asp-for="URL" class="form-control" />
+                <span asp-validation-for="URL" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReminderScheduled" class="control-label"></label>
+                <input asp-for="ReminderScheduled" class="form-control" />
+                <span asp-validation-for="ReminderScheduled" class="text-danger"></span>
+            </div>
+            <br />
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+<div class="container" style="background-color:#006699; padding:1rem; border-radius:1rem; border: 2px solid black; display: flex; flex: 1; justify-content:center; align-items:center; flex-direction: column;">
+    <form id="passwordGeneratorForm" class="form" style="display: grid; grid-template-columns: auto; row-gap:1rem; column-gap:3rem; justify-content: center; align-items: center;">
+        <h2 style="text-align: center; grid-column: span 2;">Password Generator</h2>
+        <h3 id="PwdDisplay" style="background-color: white; padding: 1rem; text-align: center; border: 1px solid #333; word-break: break-all; border-radius: 0.5rem; grid-column: span 2;">Password </h3>
+        <label for="characterAmountNumber" style="font-weight: bold;">Number of Characters</label>
+        <div style="display: flex; align-items: center;">
+            <input type="range" min="12" max="50" value="12" id="characterAmountRange" />
+            <input type="number" min="12" max="50" value="12" id="characterAmountNumber" style="width: 3rem;"/>
+        </div>
+        <label for="includeUppercase" style="font-weight: bold;">Include Uppercase</label>
+        <input type="checkbox" id="includeUpperCase" checked/>
+
+        <label for="includeNumbers" style="font-weight: bold;">Include Numbers</label>
+            <input type="checkbox" id="includeNumbers" checked />
+
+        <label for="includeSymbols" style="font-weight: bold;">Include Symbols</label>
+            <input type="checkbox" id="includeSymbols" checked />
+
+        <button type="submit" style="border:2px solid white; border-radius:0.5rem; grid-column: span 2;">Generate Password</button>
+    </form>
+</div>
+</div>
+
+<script type="text/javascript">
+    console.log('Yes');
+    const characterAmountRange = document.getElementById('characterAmountRange');
+    const characterAmountNumber = document.getElementById('characterAmountNumber');
+    const form = document.getElementById('passwordGeneratorForm');
+    const upperCaseEle = document.getElementById('includeUpperCase');
+    const numEle = document.getElementById('includeNumbers');
+    const symEle = document.getElementById('includeSymbols');
+    const pwdEle = document.getElementById('PwdDisplay');
+
+
+    characterAmountNumber.addEventListener('input', syncCharacterAmount);
+    characterAmountNumber.addEventListener('input', updatePwd);
+    characterAmountRange.addEventListener('input', syncCharacterAmount);
+    characterAmountRange.addEventListener('input', updatePwd);
+
+    const UC = arrayFromLowToHigh(65,90);
+    const LC = arrayFromLowToHigh(97,122);
+    const NUM = arrayFromLowToHigh(48, 57);
+    const SYM = arrayFromLowToHigh(33, 47).concat(arrayFromLowToHigh(58,64)).concat(arrayFromLowToHigh(91,96)).concat(arrayFromLowToHigh(123,126));
+
+    
+
+    function updatePwd() {
+        const charCnt = characterAmountNumber.value;
+        const incUpper = upperCaseEle.checked;
+        const incNum = numEle.checked;
+        const incSym = symEle.checked;
+        const password = genPwd(charCnt, incUpper, incNum, incSym);
+        pwdEle.innerText = password;
+    }
+
+    window.onload = updatePwd();
+
+    upperCaseEle.addEventListener('input',updatePwd);
+    numEle.addEventListener('input', updatePwd);
+    symEle.addEventListener('input', updatePwd);
+
+    form.addEventListener('submit', e=> {
+        e.preventDefault();
+        updatePwd();
+    })
+
+    function genPwd(charCnt, incUpper, incNum, incSym) {
+        let charCodes = LC;
+        if (incUpper) charCodes = charCodes.concat(UC);
+        if (incNum) charCodes = charCodes.concat(NUM);
+        if (incSym) charCodes = charCodes.concat(SYM);
+        console.log(charCodes);
+        const pwdChars = [];
+        for(let i=0; i < charCnt; i++) {
+            const c = charCodes[Math.floor(Math.random() * charCodes.length)];
+            pwdChars.push(String.fromCharCode(c));
+        }
+        return pwdChars.join('');
+    }
+
+    function arrayFromLowToHigh(low,high) {
+        const arr = [];
+        for(let i=low; i<=high; i++) {
+            arr.push(i);
+        }
+        return arr;
+    }
+
+    function syncCharacterAmount(e) {
+        const value = e.target.value;
+        characterAmountNumber.value = value;
+        characterAmountRange.value = value;
+    }
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

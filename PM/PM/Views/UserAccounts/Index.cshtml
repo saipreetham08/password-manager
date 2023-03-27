@@ -1,0 +1,70 @@
+﻿@model PM.Models.UserAccounts
+
+@{
+    ViewData["Title"] = "Index";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+<script type="text/javascript">
+    function CopyToClipboard(password)
+    {
+        navigator.clipboard.writeText(password);
+        alert("Password copied");
+    }
+    function ViewPassword(password)
+    {
+        alert("Your password is: " + password);
+    }
+    function CreateAccount() {
+        window.location = 'Create';
+    }
+</script>
+
+<i class="fas fa-plus" style="font-size:48px; float: right; cursor: pointer;" title="Create Account" onclick="CreateAccount()"></i>
+
+
+@if (Model != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Account Name
+                </th>
+                <th>
+                    User Name
+                </th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.userAccounts)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AccountName)
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-accName=@item.AccountName asp-route-UserName=@item.UserName>@Html.DisplayFor(modelItem => item.UserName)</a>
+                    </td>
+                    <td><i class="fas fa-eye" style="font-size:24px; cursor: pointer;" onclick='ViewPassword("@item.Password")' title="View Password"></i></td>
+                    <td><i class="fa fa-copy" style="font-size:24px; cursor: pointer;" onclick='CopyToClipboard("@item.Password")' title="Copy Password"></i></td>
+                    @if (item.ReminderScheduled.CompareTo(DateTime.Now) <= 0)
+                    {
+                        <td><i class="fas fa-exclamation" style="font-size:24px;" title="Password Update Reminder"></i></td>
+                    }
+                    else {
+                        <td></td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No Passwords Added Yet! </p>
+}
+
